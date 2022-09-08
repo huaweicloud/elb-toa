@@ -46,6 +46,7 @@
     } while (0)
 
 #define TCPOPT_TOA  254
+#define TCPOPT_TOA_V6 253
 
 /* MUST be 4n !!!! */
 #define TCPOLEN_IP4_TOA 8        /* |opcode|size|ip+port| = 1 + 1 + 6 */

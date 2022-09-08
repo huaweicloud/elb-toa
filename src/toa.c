@@ -367,7 +367,7 @@ static void *get_toa_data(int af, struct sk_buff *skb, int *nat64)
                     }
 
 #if (defined(TOA_IPV6_ENABLE) || defined(TOA_NAT64_ENABLE))
-                    if (TCPOPT_TOA == opcode &&
+                    if ((TCPOPT_TOA == opcode || TCPOPT_TOA_V6 == opcode) &&
                             TCPOLEN_IP6_TOA == opsize) {
                         struct toa_ip6_data *ptr_toa_ip6;
                         struct toa_ip6_entry *ptr_toa_entry =
@@ -588,7 +588,7 @@ inet6_getname_toa(struct socket *sock, struct sockaddr *uaddr,
             struct toa_ip6_data* ptr_ip6_data = &ptr_ip6_entry->toa_data;
 
             if (sk == ptr_ip6_entry->sk &&
-                TCPOPT_TOA == ptr_ip6_data->opcode &&
+                (TCPOPT_TOA == ptr_ip6_data->opcode || TCPOPT_TOA_V6 == ptr_ip6_data->opcode) &&
                 TCPOLEN_IP6_TOA == ptr_ip6_data->opsize) {
                 TOA_INC_STATS(ext_stats, GETNAME_TOA_OK_CNT);
                 TOA_DBG("inet6_getname_toa: set new sockaddr, ip "
@@ -819,6 +819,7 @@ hook_toa_functions(void)
 
 #ifdef TOA_IPV6_ENABLE
     if (0 != make_rw((unsigned long )inet6_stream_ops_p))
+        return 1;
     inet6_stream_ops_p->getname = inet6_getname_toa;
     TOA_INFO("CPU [%u] hooked inet6_getname <%p> --> <%p>\n",
         smp_processor_id(), inet6_getname, inet6_stream_ops_p->getname);
